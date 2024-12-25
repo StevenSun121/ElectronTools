@@ -29,17 +29,11 @@ const mainWindow = {
             this.win.focus()
         })
         this.win.on('hide', _ => {
-            this.callback()
+            this.win = this.win.destroy()
         })
-        // this.win.on('blur', () => {
-        //     this.win.hide()
-        // })
     },
     show: function() {
-        this.win ? this.win.show() : this.creat()
-    },
-    init: function(callback) {
-        this.callback = callback
+        (this.win && !this.win.isDestroyed()) ? this.win.show() : this.creat()
     }
 }
 

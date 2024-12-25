@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>NoteBook</title>
+  <link rel="stylesheet" href="./index.css" type="text/css">
+  <link rel="stylesheet" href="../../node_modules/vditor/dist/index.css" type="text/css">
+</head>
+
+<body>
+  <div class="titleBarContainer">
+    <img class="title-logo" src="./img/logo-64.png">
+    <span class="title-span">笔记本</span>
+    <div class="titleFunc">
+      <img class="title-img" id="setting" title="设置" src="../../common/img/setting.png">
+      <img class="title-img" id="min" title="最小化" src="../../common/img/min.png">
+      <img class="title-img" id="max" title="最大化" src="../../common/img/max.png">
+      <img class="title-img hide" id="resize" title="还原" src="../../common/img/resize.png">
+      <img class="title-img" id="close" title="关闭" src="../../common/img/close.png">
+    </div>
+  </div>
+  <div class="container">
+    <div class="container-div" id="container-left"></div>
+    <div class="container-div" id="container-right">
+      <div id="vditorDiv"></div>
+    </div>
+  </div>
+  <script>window.Sortable = require('../../common/js/Sortable.min.js')</script>
+  <script>
+    require('./index.js')
+  </script>
+</body>
+
+</html>

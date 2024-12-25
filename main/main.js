@@ -2,105 +2,107 @@ const {BrowserWindow, ipcMain, globalShortcut} = require('electron')
 const url = require('url')
 const path = require('path')
 
-const config = require('../common/js/config').file('config');
+const config = require('../common/js/config').file('config')
 
-var plugins = config.get("plugins")
+const utils = require('../common/js/utils')
 
-//同步插件信息
-function sycnPlugins() {
-    config.set("plugins", plugins)
-}
-
-var pluginWindows = {}
+const plugins = config.get("plugins")
 
 const mainWindow = {
     creat: function(){
         this.win = new BrowserWindow({
-            width: 800, 
-            height: 600, 
+            // width: 750, 
+            // height: 600, 
             frame: false,
             show: false,
             resizable: false,
             maximizable: false,
             minimizable: false,
-            fullscreenable: false,
+            fullscreen: true,
             // transparent: true,
-            alwaysOnTop: true,
+            // alwaysOnTop: true,
             skipTaskbar: true,
             webPreferences: {
                 nodeIntegration: true
             }
         })
-        this.win.loadURL(url.format({
-            pathname: path.join(__dirname, './index.html'),
-            protocol: 'file:',
-            slashes: true
-        }))
+        this.win.loadFile(path.join(__dirname, './index.html'))
         this.win.once('ready-to-show', () => {
-            // this.win.webContents.openDevTools()
             // this.show()
         })
         this.win.on('blur', () => {
             this.hide()
         })
     },
-    init: function(){
+    init: function(){ 
+        this.initConfigData()
         this.creat()
         globalShortcut.register("Alt+Space", _ => {
-            this.show()
-        })
-        for(var i=0; i<plugins.length; i++) {
-            let plugin = plugins[i]
-            if(plugin.usable) {
-                let pluginWindow = require("../plugins/" + plugin.code + '/main')
-                
-                let destroy = function() {
-                    pluginWindow.win.destroy()
-                    pluginWindow.win = null
-                }
-                //init初始化传入hide触发时的callback
-                pluginWindow.init(_ => {
-                    if(plugin.destroy == 0) {
-                        destroy()
-                    }else if(plugin.destroy > 0) {
-                        pluginWindow.timeout = setTimeout(_ => {
-                            destroy()
-                        }, plugin.destroy * 1000 * 60)
-                    }
-                })
-                if(plugin.shortcut != "") {
-                    globalShortcut.register(plugin.shortcut, _ => {
-                        this.pluginShow(pluginWindow)
-                    })
-                }
-                pluginWindows[plugin.code] = pluginWindow
+            if (this.win.isVisible()) {
+                this.hide()
+            } else {
+                this.show()
             }
+        })
+        this.pluginBuild()
+    },
+    pluginBuild: function() {
+        for(let i = 0; i < plugins.length; i ++) {
+            let plugin = plugins[i];
+            (_ => {
+                if(plugin.auto) {
+                    let pluginMain = require("../plugins/" + plugin.code + '/main')
+                    // 这里还是要判断一下的，不一定会有auto方法
+                    pluginMain.auto ? pluginMain.auto() : ""
+                }
+            })()
         }
     },
-    pluginShow: function(plugin) {
-        plugin.show()
-        if(plugin.timeout) {
-            clearTimeout(plugin.timeout)
-            plugin.timeout = undefined
+    pluginShow: pluginCode => {
+
+        let pluginWindow = require("../plugins/" + pluginCode + '/main')
+        if (!pluginWindow || !pluginWindow.win || pluginWindow.win.isDestroyed()){
+            for(let i = 0; i < plugins.length; i ++) {
+                let plugin = plugins[i]
+                if (plugin.code == pluginCode) {
+                    plugin.amount = plugin.amount + 1
+                    plugin.lastRun = utils.dateFormat()
+                }
+            }
         }
+        pluginWindow.show()
     },
     show: function(){
         this.win.show()
+        mainWindow.win.webContents.send("enter_start_interval")
+        // this.win.webContents.openDevTools()
     },
     hide: function(){
         this.win.hide()
+        mainWindow.win.webContents.send("hide_clear_interval")
+    },
+    initConfigData: function() {
+        for(let i = 0; i < plugins.length; i ++) {
+            let plugin = plugins[i]
+            // 2021-01-05 配置文件增加自启动配置和是否显示配置
+            // plugin.auto = false // 默认不会自动运行
+            // plugin.visiable = true // 默认可见
+            // delete plugin.shortcut
+            // delete plugin.visiable
+            // delete plugin.auto
+            // plugin.develop = false
+            // delete plugin.usable
+        }
+        config.set("plugins", plugins)
     }
 }
 
-//ipc隐藏主窗口
-ipcMain.on('hide-main-window', (event, arg) => {
-    mainWindow.hide()
-})
-
-//ipc打开插件窗口
+// ipc打开插件窗口
 ipcMain.on('show-plugin-window', (event, arg) => {
-    let pluginWindow = pluginWindows[arg]
-    mainWindow.pluginShow(pluginWindow)
+    mainWindow.pluginShow(arg)
+    mainWindow.win.hide()
+    config.set("plugins", plugins)
+    mainWindow.win.webContents.send("reloadPlugins")
 })
 
 module.exports = mainWindow

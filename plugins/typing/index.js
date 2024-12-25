@@ -14,8 +14,8 @@ function next() {
     let shengUpper = sheng ? sheng.toUpperCase().slice(0, 1) + sheng.slice(1) : sheng
     let yun = dict[sheng].list[$.random(dict[sheng].list.length)]
     let word = dict[sheng][yun]
-    let shengKey = sheng ? scheme.detail.sheng[sheng] : scheme.detail.other[yun[0]]
-    let yunKey = sheng ? scheme.detail.yun[yun] : scheme.detail.other[yun[1]]
+    let shengKey = sheng ? scheme.detail.sheng[sheng] : scheme.detail.other[yun][0]
+    let yunKey = sheng ? scheme.detail.yun[yun] : scheme.detail.other[yun][1]
 
     dictItem = {
         "sheng": shengUpper,
@@ -80,18 +80,18 @@ next()
 $("min").click(_ => {
     remote.getCurrentWindow().minimize()
 })
-//最大化
-$("max").click(_ => {
-    max.classList.toggle("hide")
-    resize.classList.toggle("hide")
-    remote.getCurrentWindow().maximize()
-})
-//取消最大化
-$("resize").click(_ => {
-    max.classList.toggle("hide")
-    resize.classList.toggle("hide")
-    remote.getCurrentWindow().unmaximize()
-})
+// //最大化
+// $("max").click(_ => {
+//     max.classList.toggle("hide")
+//     resize.classList.toggle("hide")
+//     remote.getCurrentWindow().maximize()
+// })
+// //取消最大化
+// $("resize").click(_ => {
+//     max.classList.toggle("hide")
+//     resize.classList.toggle("hide")
+//     remote.getCurrentWindow().unmaximize()
+// })
 //关闭
 $("close").click(_ => {
     remote.getCurrentWindow().hide()

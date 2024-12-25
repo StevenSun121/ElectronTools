@@ -1,10 +1,11 @@
 const {BrowserWindow, ipcMain} = require('electron')
 const url = require('url');
 const path = require('path');
-const https = require('https');
 
-const config = require('../../common/js/config').file('plugins/oneWord');
-let oneWord = config.get("oneWord")
+const childProcess = require('child_process');
+
+// const config = require('../../common/js/config').file('plugins/oneWord');
+// let oneWord = config.get("oneWord")
 
 const oneWordWindow = {
     creat: function(){
@@ -13,7 +14,7 @@ const oneWordWindow = {
             height: 550,
             frame: false,
             show: false,
-            // resizable: false,
+            resizable: false,
             maximizable: false,
             minimizable: false,
             closable: false,
@@ -35,42 +36,25 @@ const oneWordWindow = {
             this.win.show()
         })
         this.win.on('blur', () => {
-            this.callback()
+            this.loop = false
+            this.win.destroy()
         })
+        this.autoMove()
     },
-    hitokoto: function() {
-        let resData = ""
-        let req = https.get("https://v1.hitokoto.cn/?c=" + oneWord.hitokoto, res => {
-            res.on('data',function(data){
-                try {
-                    resData += data;
-                } catch (error) {
-                    // console.log(error);
-                }
-            })
-            res.on('end',function(){  
-                let resJson = JSON.parse(resData);
-                // console.log(resJson);
-                oneWordWindow.win.webContents.send("readyChange", {
-                    "word": resJson.hitokoto,
-                    "from": resJson.from
-                })
-            })
-        })
-        req.on("error", _ => {
-
-        })
+    loop: true,
+    autoMove: function() {
+        this.loop = true
+        let interval = setInterval(_=> {
+            if (this.loop) {
+                childProcess.exec(path.join(__dirname, './autoMove.exe'))
+            } else {
+                clearInterval(interval)
+            }
+        }, 1000 * 5)
     },
     show: function(){
         this.creat()
-    },
-    init: function(callback){
-        this.callback = callback
     }
 }
-
-ipcMain.on("oneWordRefresh", (event, arg) => {
-    oneWordWindow.hitokoto()
-})
 
 module.exports = oneWordWindow

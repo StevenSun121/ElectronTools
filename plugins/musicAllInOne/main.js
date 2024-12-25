@@ -33,25 +33,23 @@ const musicWindow = {
             cancelTitleBarMenu(this.win)
             this.win.show()
         })
-        this.win.on('hide', _ => {
-            // this.callback()
-        })
         this.win.on('closed', _ => {
-
+            this.win = this.win.isDestroyed() ? undefined : this.win.destroy()
+            this.lrcWin = this.lrcWin ? this.lrcWin.destroy() : null
         })
     },
     show: function(){
-        this.win ? this.win.show() : this.creat()
-    },
-    init: function(callback){
-        this.callback = callback
+        (this.win && !this.win.isDestroyed()) ? this.win.show() : this.creat()
     }
 }
 
 ipcMain.on("creatLrcWindow", (event, args) => {
+    if (musicWindow.lrcWin) {
+        return
+    }
     musicWindow.lrcWin = new BrowserWindow({
         width: 1200,
-        height: 100,
+        height: args.single ? 60 : 100,
         frame: false,
         show: false,
         resizable: false,
@@ -74,7 +72,7 @@ ipcMain.on("creatLrcWindow", (event, args) => {
     musicWindow.lrcWin.once('ready-to-show', () => {
         // musicWindow.lrcWin.webContents.openDevTools()
         musicWindow.lrcWin.setPosition(args.position[0], args.position[1])
-        musicWindow.lrcWin.setIgnoreMouseEvents(args.locked)
+        musicWindow.lrcWin.setIgnoreMouseEvents(args.locked, { 'forward': true})
         musicWindow.lrcWin.webContents.send("currentLrc", args.lrc)
         cancelTitleBarMenu(musicWindow.lrcWin)
         musicWindow.lrcWin.show()
@@ -89,14 +87,27 @@ ipcMain.on("creatLrcWindow", (event, args) => {
 })
 
 ipcMain.on("currentLrc", (event, arg) => {
-    musicWindow.lrcWin.webContents.send("currentLrc", arg)
+    if(musicWindow.lrcWin) {
+        musicWindow.lrcWin.webContents.send("currentLrc", arg)
+    }
 })
 
 ipcMain.on("lockLrcWindow", (event,arg) => {
-    musicWindow.lrcWin.setIgnoreMouseEvents(arg)
+    if(musicWindow.lrcWin) {
+        musicWindow.lrcWin.setIgnoreMouseEvents(arg, { 'forward': true})
+    }
+})
+
+ipcMain.on("LrcWindowLrcSingle", (event,arg) => {
+    if(musicWindow.lrcWin) {
+        musicWindow.lrcWin.setSize(1200, arg ? 60 : 100)
+        musicWindow.lrcWin.setContentSize(1200, arg ? 60 : 100)
+    }
 })
 
 ipcMain.on("destroyLrcWindow", (event, arg) => {
-    musicWindow.lrcWin.destroy()
+    if(musicWindow.lrcWin) {
+        musicWindow.lrcWin = musicWindow.lrcWin.destroy()
+    }
 })
 module.exports = musicWindow

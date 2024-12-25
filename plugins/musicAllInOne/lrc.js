@@ -1,10 +1,13 @@
 const {remote, ipcRenderer} = require('electron')
 
-var lrcSpan = document.getElementById("lrcSpan")
+var body = document.body
+var currentLine = document.getElementById("currentLine")
+var nextLine = document.getElementById("nextLine")
 
 //更新歌词
 ipcRenderer.on("currentLrc", (event, arg) => {
-    lrcSpan.innerText = arg
+    currentLine.innerText = arg.currentLine
+    nextLine.innerText = arg.nextLine
 })
 
 //解锁/锁定歌词时改变背景  首次获得焦点时不改变背景
@@ -15,7 +18,7 @@ ipcRenderer.on("lrcWindowFocused", (event, arg) => {
         remote.getCurrentWindow().blur()
         return
     }
-    arg ? lrcSpan.classList.add("move") : lrcSpan.classList.remove("move")
+    arg ? body.classList.add("move") : body.classList.remove("move")
 })
 
 /**

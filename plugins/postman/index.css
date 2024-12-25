@@ -1,0 +1,344 @@
+html {
+    height: 100%;
+}
+
+body {
+    margin: 0px;
+    height: 100%;
+    user-select: none;
+}
+
+.hide {
+    display: none !important;
+}
+
+.ghost {
+    opacity: 0;
+}
+
+.titleBarContainer {
+    width: 100%;
+    height: 49px;
+    border-bottom: 1px solid #00000020;
+    -webkit-app-region: drag;
+}
+
+.title-logo {
+    width: 32px;
+    height: 32px;
+    margin: 9px;
+    -webkit-user-drag: none;
+}
+
+.title-span {
+    margin: 10px 0;
+    font-size: 18px;
+    line-height: 30px;
+    font-weight: initial;
+    position: absolute;
+    cursor: default;
+    user-select: none;
+}
+
+.titleFunc {
+    -webkit-app-region: no-drag;
+    height: 49px;
+    width: 200px;
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    word-spacing: -5px;
+}
+
+.title-img {
+    width: 21px;
+    padding: 14px;
+    margin-left: 1px;
+    -webkit-user-drag: none;
+}
+
+.title-img:hover {
+    background-color: #d0d0d0;
+}
+
+#close:hover {
+    background-color: #ff5252;
+}
+
+.container {
+    width: 100%;
+    height: calc(100vh - 50px);
+    overflow: auto;
+}
+
+#group {
+    float: left;
+    width: 100px;
+    height: 100%;
+}
+
+.item:hover {
+    background-color: #ecf5ff;
+}
+
+.active {
+    color: #409eff;
+}
+
+.group-item {
+    width: 80px;
+    height: 36px;
+    padding: 10px;
+    text-align: center;
+    line-height: 36px;
+    cursor: default;
+}
+
+#history {
+    float: left;
+    width: 200px;
+    height: 100%;
+}
+
+#postman {
+    float: left;
+    width: 995px;
+    height: 100%;
+}
+
+#postman .item-name {
+    width: 100px;
+    display: inline-block;
+    font-size: 16px;
+    height: 32px;
+    margin-top: 10px;
+    float: left;
+}
+
+.mySelect {
+    height: 30px;
+    border: solid 1px #cdcdcd;
+    background: url(./img/arrow.png) no-repeat scroll right center transparent;
+    background-size: 12px;
+    background-origin: padding-box;
+    background-position: 105px 9px;
+    padding-left: 10px;
+    padding-right: 15px;
+    border-radius: 5px;
+    outline: none;
+    width: 100px;
+    font-family: Arial;
+    cursor: pointer;
+    font-size: 16px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    position: relative;
+    top: 0px;
+    -webkit-app-region: no-drag;
+}
+
+.ul {
+    margin: 1px 0 0 100px;
+    list-style: none;
+    width: 125px;
+    border: 1px solid #e4e7ed;
+    position: fixed;
+    right: 51px;
+    top: 90px;
+    z-index: 99;
+    box-shadow: 0 2px 12px 0 rgba(0,0,0,.1);
+    background-color: #fff;
+    padding-left: 0px;
+    height: 165px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.ul li span{
+    display: inline-block;
+    width: 100%;
+    height: 33px;
+    text-decoration: none;
+    color: #000;
+    padding-left: 10px;
+    font-family: Arial;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 33px;
+}
+
+.ul li span:hover{
+    background-color:#f5f7fa;
+}
+
+.myInput {
+    background-color: #fff;
+    background-image: none;
+    border-radius: 4px;
+    border: 1px solid #cdcdcd;
+    box-sizing: border-box;
+    color: #606266;
+    display: inline-block;
+    font-size: 16px;
+    height: 32px;
+    line-height: 32px;
+    outline: none;
+    padding: 0 15px;
+    transition: border-color .2s cubic-bezier(.645,.045,.355,1);
+    cursor: pointer;
+    width: 100px;
+    margin: 10px 22px 0 0;
+}
+
+#name {
+    width: 600px;
+}
+
+#url {
+    width: 850px;
+}
+
+#params {
+    width: 850px;
+    min-height: 42px;
+    float: left;
+    padding-top: 10px;
+}
+
+.param-name {
+    width: 300px;
+}
+
+.param-value {
+    width: 528px;
+}
+
+.myBtn {
+    display: inline-block;
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+    background: #fff;
+    border: 1px solid #dcdfe6;
+    -webkit-appearance: none;
+    text-align: center;
+    box-sizing: border-box;
+    outline: none;
+    margin: 0;
+    transition: .1s;
+    font-weight: 500;
+    padding: 12px 20px;
+    font-size: 14px;
+    border-radius: 4px;
+    color: #fff;
+    background-color: #409eff;
+    border-color: #409eff;
+    margin: 10px 15px 15px 0;
+}
+
+.deleteBtn {
+    display: inline-block;
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+    background: #fff;
+    border: 1px solid #dcdfe6;
+    -webkit-appearance: none;
+    text-align: center;
+    box-sizing: border-box;
+    outline: none;
+    margin: 0;
+    transition: .1s;
+    font-weight: 500;
+    padding: 8px 20px;
+    font-size: 14px;
+    border-radius: 4px;
+    color: #fff;
+    background-color: #f44336;
+    border-color: #f44336;
+    margin: 0px 0px 0px 22px;
+}
+
+.titleBtn {
+    position: fixed;
+    top: -6px;
+    left: 140px;
+    -webkit-app-region: no-drag;
+}
+
+.myTable {
+    border-collapse: collapse; 
+    width: 100%; 
+    border: 1px solid #ddd;
+    font-size: 14px; 
+}
+
+.myTable th, .myTable td {
+    padding: 5px;
+    border-right: 1px solid #ddd;
+    font-weight: normal;
+}
+
+.myTable tr {
+    border-bottom: 1px solid #ddd; 
+}
+
+.myTable tr.header, .myTable tr:hover {
+    background-color: #f1f1f1;
+}
+
+tr :nth-child(1) {
+    width: 20px;
+}
+tr :nth-child(2) {
+    width: 300px;
+}
+tr :nth-child(3) {
+    width: 300px;
+}
+tr :nth-child(4) {
+    width: 200px;
+}
+tr :nth-child(5) {
+    width: 50px;
+}
+
+td:nth-child(1) {
+    text-align: center;
+}
+td:nth-child(2) {
+    text-align: right;
+}
+td:nth-child(3) {
+    text-align: left;
+}
+td:nth-child(4) {
+    text-align: center;
+}
+td:nth-child(5) {
+    text-align: center
+}
+
+#json {
+    overflow: auto;
+    width: 100%;
+    user-select: text; 
+}
+
+/*定义滚动条高宽及背景 高宽分别对应横竖滚动条的尺寸*/
+::-webkit-scrollbar
+{
+    width: 0px;
+}
+
+:hover::-webkit-scrollbar
+{
+    width: 4px;
+}
+
+/*定义滑块 内阴影+圆角*/
+::-webkit-scrollbar-thumb
+{
+    background-color: #cccccc;
+    border-radius: 5px;
+}

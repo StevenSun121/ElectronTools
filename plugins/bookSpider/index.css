@@ -43,13 +43,22 @@ body {
     background-color: #ff5252;
 }
 
+.stautsBar {
+    position: absolute;
+    top: 16px;
+    left: 300px;
+    width: 700px;
+    text-align: center;
+    font-size: 14px;
+}
+
 .searchBar {
     -webkit-app-region: no-drag;
-    height: 49px;
-    width: 400px;
-    position: absolute;
-    left: 0px;
-    top: 0px;
+    height: 38px;
+    width: 300px;
+    position: relative;
+    left: 10px;
+    top: 6px;
     word-spacing: -5px;
 }
 
@@ -67,9 +76,7 @@ body {
     line-height: 36px;
     outline: none;
     padding: 0 15px;
-    margin-top: 7px;
-    margin-left: 10px;
-    width: 250px;
+    width: 203px;
     user-select: none;
 }
 
@@ -150,7 +157,7 @@ body {
 }
 
 .bookSearchContainer {
-    width: 800px;
+    width: 600px;
     float: left;
     height: 100%;
 }
@@ -159,40 +166,50 @@ body {
     margin-top: 10px;
     margin-left: 10px;
     border: 0px;
-    width: 790px;
+    width: 590px;
     height: 390px;
 }
 
 .resultSourceList {
-    width: 300px;
+    width: 280px;
 }
 
 .resultBookList {
-    width: 465px;
+    width: 285px;
     margin-left: 10px;
 }
 
 .bookChapterResult {
     margin-left: 10px;
     border: 0px;
-    width: 790px;
+    width: 590px;
     height: 400px;
 }
 
 .bookReplaceList {
-    width: 300px;
+    width: 280px;
     height: 385px;
 }
 
 .bookChapterList {
-    width: 465px;
+    width: 285px;
     height: 385px;
     margin-left: 10px;
 }
 
 .bookPreviewContainer {
-    width: 200px;
+    width: 564px;
     float: left;
+    height: 755px;
+    overflow-y: auto;
+    border-radius: 4px;
+    border: 1px solid #dcdfe6;
+    margin: 10px;
+    margin-left: 0;
+    padding: 10px;
+    font-size: 14px;
+    text-indent: 16px;
+    line-height: 24px;
 }
 
 

@@ -1,0 +1,68 @@
+html {
+    height: 100%;
+}
+
+body {
+    margin: 0px;
+    height: 100%;
+}
+
+.hide {
+    display: none !important;
+}
+
+.container {
+    -webkit-app-region: no-drag;
+    user-select:none;
+    height: calc(100% - 40px);
+    padding: 20px;
+    background-color: #0000004f;
+    color: #ffffff;
+}
+
+#danmu {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-size: 16px;
+    overflow: hidden;
+}
+
+#danmu li {
+    list-style: none;
+    margin: 5px 0;
+    padding: 5px 0;
+}
+
+.title {
+    position: fixed;
+    width: 246px;
+    height: 550px;
+    top: 10px;
+    left: 10px;
+    -webkit-app-region: drag;
+    -webkit-user-drag: none;
+}
+
+#close {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    -webkit-app-region: no-drag;
+    -webkit-user-drag: none;
+}
+
+#setting {
+    position: fixed;
+    background-color: white;
+    width: 250px;
+    height: 500px;
+    top: 50px;
+    right: 35px;
+    -webkit-app-region: no-drag;
+    -webkit-user-drag: none;
+}
+
+#name, #room {
+    width: 100px;
+}

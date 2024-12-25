@@ -2,15 +2,15 @@ const {BrowserWindow, ipcMain} = require('electron')
 const url = require('url')
 const path = require('path')
 
-const config = require('../../common/js/config').file('plugins/_template');
+// const config = require('../../common/js/config').file('plugins/_template');
 
 const cancelTitleBarMenu = require('../../common/js/cancelTitleBarMenu')
 
 const mainWindow = {
     creat: function(){
         this.win = new BrowserWindow({
-            width: 800, 
-            height: 600, 
+            width: 1200, 
+            height: 850, 
             frame: false,
             show: false,
             // resizable: false,
@@ -31,22 +31,16 @@ const mainWindow = {
             slashes: true
         }))
         this.win.once('ready-to-show', () => {
-            this.win.webContents.openDevTools()
+            // this.win.webContents.openDevTools()
             cancelTitleBarMenu(this.win)
             this.win.show()
         })
-        // this.win.on('hide', _ => {
-        //     this.callback()
-        // })
-        // this.win.on('blur', () => {
-        //     this.win.hide()
-        // })
+        this.win.on('hide', _ => {
+            this.win = this.win.destroy()
+        })
     },
     show: function() {
-        this.win ? this.win.show() : this.creat()
-    },
-    init: function(callback) {
-        this.callback = callback
+        (this.win && !this.win.isDestroyed()) ? this.win.show() : this.creat()
     }
 }
 

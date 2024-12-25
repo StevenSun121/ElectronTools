@@ -34,14 +34,10 @@ const translateWindow = {
             this.isReady = true
             this.sendQuery()
         })
-        this.win.on('hide', _ => {
-            this.callback()
-        })
         this.win.on('blur', () => {
-            this.win.hide()
-        })
-        this.win.on('closed', _ => {
             this.isReady = false
+            clearInterval(this.focusInterval)
+            this.win = this.win.destroy()
         })
     },
     sendQuery: function() {
@@ -49,12 +45,13 @@ const translateWindow = {
             this.isClip = false
             this.win.show()
             this.win.webContents.send('translateQuery', this.query);
-            this.win.focus()
+            this.focusLoop()
         }
     },
     show: function(){
+        this.focusInterval = 0
         //TODO 有时页面打不开
-        if(! this.win)
+        if(!this.win)
             this.creat()
         getClipText(query => {
             this.isClip = true
@@ -62,8 +59,12 @@ const translateWindow = {
             this.sendQuery()
         })
     },
-    init: function(callback){
-        this.callback = callback
+    focusLoop: function(){
+        clearInterval(this.focusInterval)
+        this.focusInterval = setInterval(_ => {
+            if(this.win)
+                this.win.focus()
+        }, 250)
     }
 }
 

@@ -11,6 +11,10 @@ class Config{
         this.nconf.load();
         return this;
     }
+    reload() {
+        this.nconf.load()
+        return this
+    }
     get(key) {
         return this.nconf.get(key);
     }

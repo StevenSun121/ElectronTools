@@ -1,4 +1,4 @@
-const {BrowserWindow, ipcMain} = require('electron');
+const {BrowserWindow} = require('electron');
 const url = require('url');
 const path = require('path');
 
@@ -28,20 +28,14 @@ const todoListWindow = {
         this.win.once('ready-to-show', () => {
             // this.win.webContents.openDevTools()
             cancelTitleBarMenu(this.win)
-            this.win.show();
+            this.win.show()
         })
         this.win.on('hide', _ => {
-            this.callback()
-        })
-        this.win.on('closed', _ => {
-            this.win = null
+            this.win = this.win.destroy()
         })
     },
     show: function() {
-        this.win ? this.win.show() : this.creat()
-    },
-    init: function(callback) {
-        this.callback = callback
+        (this.win && !this.win.isDestroyed()) ? this.win.show() : this.creat()
     }
 }
 

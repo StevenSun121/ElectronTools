@@ -29,19 +29,16 @@ const idcardWindow = {
             slashes: true
         }))
         this.win.once('ready-to-show', () => {
-            this.win.webContents.openDevTools()
+            // this.win.webContents.openDevTools()
             cancelTitleBarMenu(this.win)
             this.win.show()
         })
         this.win.on('hide', _ => {
-            this.callback()
+            this.win = this.win.destroy()
         })
     },
     show: function() {
-        this.win ? this.win.show() : this.creat()
-    },
-    init: function(callback) {
-        this.callback = callback
+        (this.win && !this.win.isDestroyed()) ? this.win.show() : this.creat()
     }
 }
 

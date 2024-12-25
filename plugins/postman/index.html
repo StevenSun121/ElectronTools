@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Postman</title>
+  <link rel="stylesheet" href="./index.css" type="text/css">
+</head>
+
+<body>
+  <div class="titleBarContainer">
+    <img class="title-logo" src="./img/logo-64.png">
+    <span class="title-span">Postman</span>
+    <button class="myBtn titleBtn" id="addHistory">新请求</button>
+    <div class="titleFunc">
+      <img class="title-img" id="setting" title="设置" src="../../common/img/setting.png">
+      <img class="title-img" id="min" title="最小化" src="../../common/img/min.png">
+      <img class="title-img" id="max" title="最大化" src="../../common/img/max.png">
+      <img class="title-img hide" id="resize" title="还原" src="../../common/img/resize.png">
+      <img class="title-img" id="close" title="关闭" src="../../common/img/close.png">
+    </div>
+  </div>
+  <div class="container">
+    <div class="hide" id="template">
+      <div class="group-item item">
+        <span class="group-item-span"></span>
+      </div>
+      <div class="history-item">
+        <span class="history-item-span"></span>
+      </div>
+      <div class="params-item">
+        <input type="text" class="myInput param-name"><input type="text" class="myInput param-value">
+      </div>
+    </div>
+    <div id="group"></div>
+    <div id="history"></div>
+    <div id="postman" class="hide">
+      <span class="item-name">接口名称：</span>
+      <input type="text" id="name" class="myInput">
+      <input id="method" class="mySelect" value="GET" type="text" readonly/>
+      <button id="deleteItem" class="deleteBtn">删除</button><br>
+      <span class="item-name">接口地址：</span><input type="text" id="url" class="myInput"><br>
+      <span class="item-name">接口参数：</span>
+      <div id="params">
+        <table class="myTable" id="myTable"></table>
+      </div><br>
+      <span class="item-name"></span><button id="addParam" class="myBtn">添加参数</button><button id="request" class="myBtn">发送请求</button><br>
+      <div id="json"></div>
+    </div>
+    <ul id="selectUl" class="ul hide">
+      <li method="GET"><span>GET</span></li>
+      <li method="POST"><span>POST</span></li>
+    </ul>
+  </div>
+  <script>window.Sortable = require('../../common/js/Sortable.min.js')</script>
+  <script>
+    require('./index.js')
+  </script>
+</body>
+
+</html>

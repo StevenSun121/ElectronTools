@@ -1,0 +1,144 @@
+html {
+    height: 100%;
+}
+
+body {
+    margin: 0px;
+    height: 100%;
+}
+
+.hide {
+    display: none !important;
+}
+
+.titleBarContainer {
+    width: 100%;
+    height: 49px;
+    border-bottom: 1px solid #00000020;
+    -webkit-app-region: drag;
+}
+
+.title-logo {
+    width: 32px;
+    height: 32px;
+    margin: 9px;
+    -webkit-user-drag: none;
+}
+
+.title-span {
+    margin: 10px 0;
+    font-size: 18px;
+    line-height: 30px;
+    font-weight: initial;
+    position: absolute;
+    cursor: default;
+    user-select: none;
+}
+
+.titleBtn {
+    -webkit-app-region: no-drag;
+    height: 45px;
+    width: 700px;
+    position: absolute;
+    left: 100px;
+    top: 2px;
+}
+
+#search {
+    width: 125px;
+}
+
+#chapter {
+    height: 22px;
+}
+
+.titleFunc {
+    -webkit-app-region: no-drag;
+    height: 49px;
+    width: 150px;
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    word-spacing: -5px;
+}
+
+.title-img {
+    width: 21px;
+    padding: 14px;
+    margin-left: 1px;
+    -webkit-user-drag: none;
+}
+
+.title-img:hover {
+    background-color: #d0d0d0;
+}
+
+#close:hover {
+    background-color: #ff5252;
+}
+
+.container {
+    width: 100%;
+    height: calc(100vh - 50px);
+    overflow: auto;
+}
+
+.cartoonListItem {
+    width: 167px;
+    float: left;
+    margin: 10px 0 10px 10px;
+    height: 300px;
+}
+
+.cartoonListItem img {
+    width: 167px;
+    height: 220px;
+    display: block;
+    -webkit-user-drag: none;
+}
+
+.cartoonListItem .title {
+    margin: 0;
+} 
+
+.cartoonListItem .chapter {
+    margin: 0;
+    font-size: 14px;
+}
+
+#cartoonRead h2 {
+    text-align: center;
+}
+
+#cartoonRead img {
+    /* width: 720px; */
+    margin: 0 auto;
+    display: block;
+    -webkit-user-drag: none;
+}
+
+#chapter {
+    width: 100px;
+}
+
+button {
+    padding: 10px 2px;
+}
+
+/*定义滚动条高宽及背景 高宽分别对应横竖滚动条的尺寸*/
+::-webkit-scrollbar
+{
+    width: 0px;
+}
+
+:hover::-webkit-scrollbar
+{
+    width: 10px;
+}
+
+/*定义滑块 内阴影+圆角*/
+::-webkit-scrollbar-thumb
+{
+    background-color: #0000001a;
+    border-radius: 5px;
+}

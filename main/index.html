@@ -7,9 +7,53 @@
   </head>
   <body>
     <div class="container">
-      <div id="usable"></div>
-      <HR class="line">
-      <div id="unusable"></div>
+      <div id="monitor">
+        <div id="current_time">
+          <span id="current_time_hour">00</span>
+          <span>:</span>
+          <span id="current_time_minute">00</span>
+          <span>:</span>
+          <span id="current_time_second">00</span>
+          <span id="current_time_lunar"></span>
+        </div>
+        <div id="current_date">
+          <span id="current_date_solar"></span><br>
+          <span id="current_date_lunar"></span>
+        </div>
+        <div id="CPU_monitor">
+          <br>
+          <span>CPU: </span><span id="average_CPU_usage"></span>
+        </div>
+        <div id="RAM_monitor">
+          <br>
+          <span>RAM_usage: </span><span id="RAM_usage"></span>
+          <br>
+          <span>RAM_free: </span><span id="RAM_free"></span>
+          <br>
+          <span>RAM_total: </span><span id="RAM_total"></span>
+          <br>
+          <span>RAM_percent: </span><span id="RAM_percent"></span>
+          <br>
+          <br>
+        </div>
+        <div id="up_time">
+          <span>开机时间:</span>
+          <span id="up_time_day">00</span>
+          <span>天</span>
+          <span id="up_time_hour">00</span>
+          <span>时</span>
+          <span id="up_time_minute">00</span>
+          <span>分</span>
+          <span id="up_time_second">00</span>
+          <span>秒</span>
+        </div>
+      </div>
+      <div id="tool"></div>
+      <div id="board">
+        <ul id="board_count"></ul>
+        <hr/>
+        <ul id="board_left"></ul>
+      </div>
     </div>
     <script>
       require('./index.js')

@@ -9,11 +9,16 @@ const config = require('../../common/js/config').file('plugins/musicAllInOne');
 
 const $ = require('../../common/js/domUtils')
 
+const search = require('./search')
+
 var playerConfig = config.get("playerConfig")
 var playerStatus = config.get("playerStatus")
 var musicSearch = config.get("musicSearch")
 var musicLocal = config.get("musicLocal")
 var musicHistory = config.get("musicHistory")
+
+//搜索框获取焦点时，按空格不会暂停歌曲
+var searchSpace = false
 
 /**
  * 基础方法
@@ -132,6 +137,12 @@ $("musicSearchFunc").click(_ => {
         $("musicListUl").html("")
         
         buildSearchResultList()
+    
+        $("musicSearchInput").value(musicSearch.query),
+        $("musicSearchTypeValue").value(musicSearch.type)
+        $("musicSearchType").value(musicSearch.type_name)
+        $("musicSearchSiteValue").value(musicSearch.site)
+        $("musicSearchSite").value(musicSearch.site_name)
     }
 })
 
@@ -255,40 +266,44 @@ function buildSearchResultList(startIndex) {
 
         let li = $(document.createElement("li"))
 
-        li.append("<span style='width: 30px;'>" + (index + 1) + "</span>")
-            .append("<span style='width: 200px;'>" + data.name + "</span>")
-            .append("<span style='width: 130px;'>" + data.author + "</span>")
-            .append("<span style='width: 60px;'>" + siteCodeToName(data.site) + "</span>")
-            .append("<span style='width: 60px;'>" + timeFormate(data.time) + "</span>")
+        let delLine = data.url ? "'>" : " text-decoration: line-through;'>"
+
+        li.append("<span style='width: 30px;" + delLine + (index + 1) + "</span>")
+            .append("<span style='width: 200px;" + delLine + data.name + "</span>")
+            .append("<span style='width: 130px;" + delLine + data.author + "</span>")
+            .append("<span style='width: 60px;" + delLine + siteCodeToName(data.site) + "</span>")
+            .append("<span style='width: 60px;" + delLine + timeFormate(data.time) + "</span>")
             .append("<div class='link'></div>", _ => {
                 openLink(data.link)
         })
 
         var localIndex = musicLocal.length ? musicLocal.findIndex(item => { return item.name == data.name && item.author == data.author }) : -1
 
-        if(localIndex < 0) {
-            //歌曲信息可能过期,需要重新获取
-            // data = getNewMusicDataInfo()
-            li.append("<div class='download'></div>", _ => {
-                musicLocal.unshift({
-                    "name"  : data.name,
-                    "author": data.author,
-                    "mtype" : data.mtype,
-                    "ptype" : data.ptype,
-                    "time"  : data.time
+        if (data.url) {
+            if(localIndex < 0) {
+                //歌曲信息可能过期,需要重新获取
+                // data = getNewMusicDataInfo()
+                li.append("<div class='download'></div>", _ => {
+                    musicLocal.unshift({
+                        "name"  : data.name,
+                        "author": data.author,
+                        "mtype" : data.mtype,
+                        "ptype" : data.ptype,
+                        "time"  : data.time
+                    })
+                    downloadMusicFiles(data, _ => {
+                        li.lastChild().remove()
+                    })
+                    localSync()
+                    playerStatus.index = playerStatus.index + 1
+                    statusSync()
                 })
-                downloadMusicFiles(data, _ => {
-                    li.lastChild().remove()
-                })
-                localSync()
-                playerStatus.index = playerStatus.index + 1
-                statusSync()
+            }
+            
+            li.dblclick(_ => {
+                setMusicInfo(data.name, data.author, data.time, data.url, data.pic, data.lrc, true, false)
             })
         }
-        
-        li.dblclick(_ => {
-            setMusicInfo(data.name, data.author, data.time, data.url, data.pic, data.lrc, true, false)
-        })
 
         $("musicListUl").insert(li, loadPageLi)
     }
@@ -299,6 +314,16 @@ function buildSearchResultList(startIndex) {
  * 标题栏功能
  */
 
+//设置
+let settingMouse = false
+$("setting").click(_ => {
+    $("settingDiv").toggle()
+})
+
+$("titleBarContainer").mouseleave(_ => {
+    $("settingDiv").hide()
+})
+
 //最小化
 $("min").click(_ => {
     remote.getCurrentWindow().minimize()
@@ -306,7 +331,11 @@ $("min").click(_ => {
 
 //关闭
 $("close").click(_ => {
-    remote.getCurrentWindow().hide()
+    if($("playMusic").hasClass("pause")) {
+        remote.getCurrentWindow().hide()
+    }else {   
+        remote.getCurrentWindow().destroy()
+    }
 })
 
 //选择网站select
@@ -352,6 +381,10 @@ $("musicSearchInput").keydown(e => {
     if(e.keyCode == $.keyCode.Enter) {
         $("musicSearchBtn").click()
     }
+}).focus(_ => {
+    searchSpace = true
+}).blur(_ => {
+    searchSpace = false
 })
 
 //点击查询按钮
@@ -365,7 +398,9 @@ $("musicSearchBtn").click(_ => {
     musicSearch = {
         "query" : $("musicSearchInput").value(),
         "type"  : $("musicSearchTypeValue").value(),
+        "type_name"  : $("musicSearchType").value(),
         "site"  : $("musicSearchSiteValue").value(),
+        "site_name"  : $("musicSearchSite").value(),
         "page"  : 1,
         "data"  : []
     }
@@ -381,7 +416,7 @@ $("musicSearchBtn").click(_ => {
 
 //设置歌词
 let currentLrcLine = -1
-let currentLrcContext = ""
+let currentLrcContext = {}
 let lrcLines = []
 let lrcNodes = []
 function setMusicLrc(lrc) {
@@ -393,7 +428,10 @@ function setMusicLrc(lrc) {
     pattern = /\[\d{2}:\d{2}(.\d{1,3})?\]/g;
     //切换歌曲时初始化所有状态
     currentLrcLine = -1
-    currentLrcContext = ""
+    currentLrcContext = {
+        currentLine: "",
+        nextLine: ""
+    }
     lrcLines = []
     lrcNodes = []
     musicLrcUl.removeClass("noPadding")
@@ -425,11 +463,26 @@ function setMusicLrc(lrc) {
         lrcLines.sort(function(a, b) {
             return a[0] - b[0];
         });
-        for(var i=0;i<lrcLines.length;i++){
-            musicLrcUl.append("<li>" + lrcLines[i][1] + "</li>")
+        for(let i=0;i<lrcLines.length;i++){
+            musicLrcUl.append("<li>" + lrcLines[i][1] + "</li>", _ => {
+                isMoving = true
+                let musicAudio = $("musicAudio").node
+                musicAudio.pause();
+                $("playRange").value(lrcLines[i][0])
+                playRangeInput()
+                musicAudio.currentTime = lrcLines[i][0]
+                musicAudio.play();
+                $("playMusic").addClass("pause")
+                isMoving = false
+            }, "dblclick")
         }
         lrcNodes = musicLrcUl.children()
-        currentLrcContext = lrcLines[0][0] == 0 ? lrcLines[0][1] : ""
+        if (lrcLines[0][0] == 0) {
+            currentLrcContext.currentLine = lrcLines[0][1]
+            currentLrcContext.nextLine = lrcLines[1][1]
+        } else {
+            currentLrcContext.nextLine = lrcLines[0][1]
+        }
         // musicLrcUl.firstChild.classList.add("current")
     }else{
         //当歌词内无时间。全部展示
@@ -439,14 +492,14 @@ function setMusicLrc(lrc) {
                 musicLrcUl.append("<li>" + lines[i] + "</li>")
             }
             musicLrcUl.addClass("noPadding")
-            currentLrcContext = "请打开主界面查看歌词"
+            currentLrcContext.currentLine = "请打开主界面查看歌词"
             if(playerStatus.desktopLrc) {
                 currentLrcFunc()
             }
         }else{
             musicLrcUl.append("<li>暂无歌词</li>")
             musicLrcUl.firstChild.addClass("current")
-            currentLrcContext = "暂无歌词"
+            currentLrcContext.currentLine = "暂无歌词"
             if(playerStatus.desktopLrc) {
                 currentLrcFunc()
             }
@@ -460,33 +513,10 @@ function setMusicLrc(lrc) {
 
 //查询歌曲构建列表
 function musicSearchResult() {
-    
-    let queryString  =  "query=" + musicSearch.query + 
-                        "&type=" + musicSearch.type + 
-                        "&site=" + musicSearch.site + 
-                        "&page=" + musicSearch.page
-
-    let resData = ""
-    var req = http.get("http://localhost:8088/music?" + queryString, function(res){  
-        res.on('data',function(data){
-            try {
-                resData += data;
-            } catch (error) {
-                console.log(error);
-            }
-        })
-        res.on('end',function(){
-            let resJson = JSON.parse(resData);
-            console.log(resJson)
-            if(resJson.code == 200) {
-                let datas = resJson.data
-                musicSearch.data.push(...datas)
-                buildSearchResultList(musicSearch.page * 10 - 10)
-                searchSync()
-            }
-        })
-    })
-    req.on('error',function(err){
+    search(musicSearch).then(_ => {
+        buildSearchResultList(musicSearch.page * 10 - 10)
+        searchSync()
+    }, err => {
         console.log(err)
     })
 }
@@ -649,16 +679,50 @@ function prevMusic() {
     buildSetMusicInfo(index, true)
 }
 
-//播放 暂停
+//播放 暂停 按钮点击
+var pauseInterval
 $("playMusic").click(_ => {
     let musicAudio = $("musicAudio").node
+    let volumeRange = $("volumeRange").value() / 100
+    let volumeStep = volumeRange / 10
+    clearInterval(pauseInterval)
     if($("playMusic").hasClass("pause")) {
-        musicAudio.pause()
+        pauseInterval = setInterval(_ => {
+            let volume = musicAudio.volume - volumeStep
+            console.log(volume)
+            if (volume < 0.001) {
+                musicAudio.volume = 0
+                musicAudio.pause()
+                musicAudio.volume = volumeRange
+                clearInterval(pauseInterval)
+            } else {
+                musicAudio.volume = volume
+            }
+        }, 100)
     }else {
+        musicAudio.volume = 0
         musicAudio.play()
+        pauseInterval = setInterval(_ => {
+            let volume = musicAudio.volume + volumeStep
+            console.log(volume)
+            if (volume + 0.001 >= volumeRange) {
+                musicAudio.volume = volumeRange
+                clearInterval(pauseInterval)
+            } else {
+                musicAudio.volume = volume
+            }
+        }, 100)
     }
     $("playMusic").toggle("pause")
 })
+
+//空格键播放 暂停
+window.onkeydown = function(e) {
+    if(e.keyCode == $.keyCode.Space && !searchSpace) {
+        e.preventDefault()
+        $("playMusic").click()
+    }
+}
 
 //下一曲 按钮点击
 $("nextMusic").click(nextMusic)
@@ -818,7 +882,8 @@ $("musicAudio").timeupdate(event => {
             }
             $(lrcNodes[currentIndex]).addClass("current")
             $("musicLrcUl").scrollTop(lrcNodes[currentIndex].offsetTop - 251)
-            currentLrcContext = lrcLines[currentIndex][1]
+            currentLrcContext.currentLine = lrcLines[currentIndex][1]
+            currentLrcContext.nextLine = currentIndex == lrcLines.length - 1 ? "" : lrcLines[currentIndex + 1][1]
             if(playerStatus.desktopLrc) {
                 currentLrcFunc()
             }
@@ -832,7 +897,8 @@ function creatLrcWindow() {
     ipcRenderer.send("creatLrcWindow", {
         "lrc": currentLrcContext,
         "position": playerStatus.desktopLrcPosition,
-        "locked": playerStatus.desktopLrcLocked
+        "locked": playerStatus.desktopLrcLocked,
+        "single": playerStatus.desktopLrcSingleLine
     })
 }
 
@@ -855,40 +921,63 @@ ipcRenderer.on("lrcWindowMovePosition", (event, args) => {
 })
 
 /**
+ * 歌词设置
+ */
+// 锁定桌面歌词
+let desktopLrcLocked = $("desktopLrcLocked")
+let desktopLrcLockedLabel = $("desktopLrcLockedLabel")
+let desktopLrcSingleLine = $("desktopLrcSingleLine")
+let desktopLrcSingleLineLabel = $("desktopLrcSingleLineLabel")
+desktopLrcLockedLabel.text(playerStatus.desktopLrcLocked ? "✅" : "❎")
+desktopLrcSingleLineLabel.text(playerStatus.desktopLrcSingleLine ? "✅" : "❎")
+desktopLrcLocked.click(_ => {
+    playerStatus.desktopLrcLocked = !playerStatus.desktopLrcLocked
+    ipcRenderer.send("lockLrcWindow", playerStatus.desktopLrcLocked)
+    desktopLrcLockedLabel.text(playerStatus.desktopLrcLocked ? "✅" : "❎")
+    statusSync()
+})
+desktopLrcSingleLine.click(_ => {
+    playerStatus.desktopLrcSingleLine = !playerStatus.desktopLrcSingleLine
+    ipcRenderer.send("LrcWindowLrcSingle", playerStatus.desktopLrcSingleLine)
+    desktopLrcSingleLineLabel.text(playerStatus.desktopLrcSingleLine ? "✅" : "❎")
+    statusSync()
+})
+
+/**
  * 页面右键上下文菜单
  */
 
-document.addEventListener('contextmenu', (e) => {
-    e.preventDefault()
-    let menu = new Menu()
+// document.addEventListener('contextmenu', (e) => {
+//     e.preventDefault()
+//     let menu = new Menu()
 
-    console.log(e.srcElement.id)
+//     console.log(e.srcElement.id)
 
-    //桌面歌词 解锁/锁定 时 记录状态
-    if(e.srcElement.id == "musicLrc") {
-        if(playerStatus.desktopLrcLocked) {
-            menu.append(new MenuItem({
-                label: '解锁桌面歌词',
-                click(){
-                    playerStatus.desktopLrcLocked = false
-                    ipcRenderer.send("lockLrcWindow", false)
-                    statusSync()
-                }
-            }))
-        }else {
-            menu.append(new MenuItem({
-                label: '锁定桌面歌词',
-                click(){
-                    playerStatus.desktopLrcLocked = true
-                    ipcRenderer.send("lockLrcWindow", true)
-                    statusSync()
-                }
-            }))
-        }
-        menu.popup({ window: remote.getCurrentWindow() })
-    }
+//     //桌面歌词 解锁/锁定 时 记录状态
+//     if(e.srcElement.id == "musicLrc") {
+//         if(playerStatus.desktopLrcLocked) {
+//             menu.append(new MenuItem({
+//                 label: '解锁桌面歌词',
+//                 click(){
+//                     playerStatus.desktopLrcLocked = false
+//                     ipcRenderer.send("lockLrcWindow", false)
+//                     statusSync()
+//                 }
+//             }))
+//         }else {
+//             menu.append(new MenuItem({
+//                 label: '锁定桌面歌词',
+//                 click(){
+//                     playerStatus.desktopLrcLocked = true
+//                     ipcRenderer.send("lockLrcWindow", true)
+                    // statusSync()
+//                 }
+//             }))
+//         }
+//         menu.popup({ window: remote.getCurrentWindow() })
+//     }
 
-}, false)
+// }, false)
 
 /**
  * 页面初始化

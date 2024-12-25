@@ -10,18 +10,33 @@ body {
     /* background-color: #dedede; */
 }
 
-#lrcSpan {
+#currentLine {
     width: 1200px;
-    height: 100px;
+    height: 60px;
     display: inline-block;
     font-size: 35px;
     text-align: center;
-    line-height: 100px;
+    line-height: 60px;
     /* -webkit-text-stroke: 0.5px #FFF; */
     color: #24abf2;
     user-select: none;
+    /* -webkit-app-region: no-drag; */
 }
 
-#lrcSpan.move {
+#nextLine {
+    width: 1200px;
+    height: 40px;
+    display: inline-block;
+    font-size: 24px;
+    text-align: center;
+    line-height: 40px;
+    /* -webkit-text-stroke: 0.5px #FFF; */
+    color: #24abf2;
+    user-select: none;
+    /* -webkit-app-region: no-drag; */
+}
+
+
+.move {
     background-color: #8c8c8c3b;
 }

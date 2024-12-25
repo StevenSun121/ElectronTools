@@ -3,21 +3,22 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>template</title>
+  <title>小说下载</title>
   <link rel="stylesheet" href="./index.css" type="text/css">
 </head>
 
 <body>
   <div class="titleBarContainer">
     <div class="searchBar">
-      <input type="text" class="searchBookName" id="searchName">
+      <input type="text" class="searchBookName" id="searchName" placeholder="输入书名">
       <button class="searchBookButton" id="searchButton"><span>查询</span></button>
     </div>
+    <div class="stautsBar" id="searchStatus"></div>
     <div class="titleFunc">
-      <img class="title-img" id="setting" title="设置" src="../../common/img/setting.png">
+      <!-- <img class="title-img" id="setting" title="设置" src="../../common/img/setting.png"> -->
       <img class="title-img" id="min" title="最小化" src="../../common/img/min.png">
-      <img class="title-img" id="max" title="最大化" src="../../common/img/max.png">
-      <img class="title-img hide" id="resize" title="还原" src="../../common/img/resize.png">
+      <!-- <img class="title-img" id="max" title="最大化" src="../../common/img/max.png"> -->
+      <!-- <img class="title-img hide" id="resize" title="还原" src="../../common/img/resize.png"> -->
       <img class="title-img" id="close" title="关闭" src="../../common/img/close.png">
     </div>
   </div>
@@ -44,9 +45,7 @@
         </div>
       </div>
     </div>
-    <div class="bookPreviewContainer" id="bookPreviewContainer">
-123
-    </div>
+    <div class="bookPreviewContainer" id="bookPreviewContainer"></div>
   </div>
   <script>
     require('./index.js')

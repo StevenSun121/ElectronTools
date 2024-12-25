@@ -1,7 +1,4 @@
-const electron = require('electron');
-const http = require('http');
-const remote = electron.remote;
-const ipc = electron.ipcRenderer;
+const {remote} = require('electron');
 const { Menu, MenuItem } = remote
 
 const $ = require('../../common/js/domUtils')
@@ -209,26 +206,34 @@ function addItemFunc(group, itemData, position, node) {
     span.onblur = span.onkeydown = function(evt){
         let spanText = this.innerText
         let spanVal = this.value
-        if(evt.type == "blur" || evt.keyCode == $.keyCode.Enter) {
-            if(spanText == ""){
-                if(spanVal == ""){
+        if (evt.keyCode == $.keyCode.Enter && evt.shiftKey) {
+            cursorAppendEnter()
+            evt.preventDefault();
+            evt.stopPropagation();
+        } else if (evt.type == "blur" || evt.keyCode == $.keyCode.Enter) {
+            if (spanText == "") {
+                if (spanVal == "") {
                     this.parentElement.remove()
                     return
-                }else{
+                } else {
                     this.innerText = spanVal
                 }
-            }else{
+            } else {
                 this.value = spanText
                 let columnIndex = getNodeIndex(tempNode.parentElement.parentElement.parentElement, column_container)
                 let itemIndex = getNodeIndex(tempNode, tempNode.parentElement)
-                if(spanVal == ""){
+                if (spanVal == "") {
                     addItem(columnIndex, itemIndex, spanText)
-                }else if(spanText != spanVal){
+                } else if (spanText != spanVal) {
                     updateItem(columnIndex, itemIndex, spanText, checkbox.checked)
                 }
             }
             span.contentEditable = false
-        }else if(evt.keyCode == $.keyCode.Escape) {
+        } else if (evt.keyCode == $.keyCode.F1) {
+            addItemFunc(group, null, "up", tempNode)
+        } else if (evt.keyCode == $.keyCode.F4) {
+            addItemFunc(group, null, "down", tempNode)
+        } else if (evt.keyCode == $.keyCode.Escape) {
             if(spanVal == ""){
                 this.onblur = null
                 this.parentElement.remove()
@@ -242,13 +247,14 @@ function addItemFunc(group, itemData, position, node) {
     span.ondblclick = function() {
         span.contentEditable = true
         span.focus()
+        cursorMoveToEnd(this)
     }
 
     checkbox.onclick = function() {
         span.classList.toggle("delLine")
         let itemIndex = getNodeIndex(tempNode, tempNode.parentElement)
         let columnIndex = getNodeIndex(tempNode.parentElement.parentElement.parentElement, column_container)
-        updateItem(columnIndex, itemIndex, span.innerText, this.checked)
+        autoSortItem(columnIndex, itemIndex, tempNode, span.innerText, this.checked)
     }
 
     if(itemData){
@@ -278,6 +284,28 @@ function addItemFunc(group, itemData, position, node) {
         }
         span.focus()
     }
+}
+
+// 双击文本修改时，光标移动到最后
+function cursorMoveToEnd(node) {
+    let range = document.createRange();
+    range.selectNodeContents(node);
+    range.collapse(false);
+    let sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+
+}
+
+// 修改文本内容时，在光标位置添加回车
+function cursorAppendEnter() {
+    let sel = getSelection()
+    let offset = sel.focusOffset
+    let isEnd = sel.focusNode.constructor.name == "HTMLSpanElement"
+    offset = isEnd ? sel.focusNode.textContent.length : offset
+    sel.focusNode.textContent = sel.focusNode.textContent.substr(0, offset) + "\n" + sel.focusNode.textContent.substr(offset) + (isEnd ? " " : "")
+    offset = isEnd ? sel.focusNode.textContent.length - 1 : offset + 1
+    isEnd ? sel.setBaseAndExtent(sel.focusNode.firstChild, offset, sel.focusNode.firstChild, offset) : sel.setBaseAndExtent(sel.focusNode, offset, sel.focusNode, offset)
 }
 
 //添加任务同步
@@ -320,6 +348,45 @@ function sortItem(evt) {
             })
         }
     }
+    syncToDoList()
+}
+
+// 移动任务到最前面
+function moveItemToTopFunc (group, node) {
+    let itemIndex = getNodeIndex(node, group)
+    let columnIndex = getNodeIndex(group.parentElement.parentElement, column_container)
+    if (itemIndex == 0) {
+        return
+    }
+    group.insertBefore(node, group.firstElementChild)
+    groupData[columnIndex].toDoItemList.unshift(groupData[columnIndex].toDoItemList.splice(itemIndex, 1)[0])
+    syncToDoList()
+}
+
+//任务自动排序
+function autoSortItem(columnIndex, itemIndex, node, itemName, itemChecked) {
+    let itemList = groupData[columnIndex].toDoItemList
+    let newIndex = 0
+    let noChecked = true
+    if (itemChecked) {
+        newIndex = itemList.length - 1
+        for (let index = 0; index < itemList.length; index ++) {
+            if (itemList[index].checked) {
+                newIndex = index - 1
+                noChecked = false
+                break;
+            }
+        }
+    }
+    if (itemIndex != newIndex) {
+        itemList.splice(newIndex, 0, itemList.splice(itemIndex, 1)[0])
+        if (noChecked && itemChecked) {
+            node.parentElement.append(node)
+        } else {
+            node.parentElement.insertBefore(node, $(node).siblings()[itemChecked ? newIndex + 1 : newIndex])
+        }
+    }
+    itemList[newIndex].checked = itemChecked
     syncToDoList()
 }
 
@@ -383,29 +450,32 @@ column_container.addEventListener('contextmenu', (e) => {
             let group = node.parentElement
             let index = getNodeIndex(node, group)
             menu.append(new MenuItem({
-                label: '添加任务',
-                click(){
-                    addItemFunc(group)
-                }
-            }))
-            menu.append(new MenuItem({
                 label: '添加任务到顶部',
                 click(){
-                    addItemFunc(group, null, "top", null, 0)
+                    addItemFunc(group, null, "top", null)
                 }
             }))
             menu.append(new MenuItem({
                 label: '添加任务到上一个',
                 click(){
-                    addItemFunc(group, null, "up", node, index)
+                    addItemFunc(group, null, "up", node)
                 }
             }))
             menu.append(new MenuItem({
                 label: '添加任务到下一个',
                 click(){
-                    addItemFunc(group, null, "down", node, index+1)
+                    addItemFunc(group, null, "down", node)
                 }
             }))
+            if (!$(node).lastChild().hasClass("delLine")) {
+                menu.append(new MenuItem({ type: 'separator' }))
+                menu.append(new MenuItem({
+                    label: '移动到最前',
+                    click(){
+                        moveItemToTopFunc(group, node)
+                    }
+                }))
+            }
             menu.append(new MenuItem({ type: 'separator' }))
             menu.append(new MenuItem({
                 label: '删除任务',

@@ -4,7 +4,8 @@
 
 function $(id) {
     let node = typeof id == "string" ? document.getElementById(id) : id
-    return new domUtils(node)
+    if(node)
+        return new domUtils(node)
 }
 
 //创建node
@@ -21,6 +22,7 @@ class domUtils {
             this[item] = callback => {
                 let event = "on" + item
                 callback ? this.node[event] = callback : this.node[item]()
+                return this
             }
         })
         return this;
@@ -47,10 +49,12 @@ class domUtils {
     //添加样式
     addClass(className) {
         this.node.classList.add(className)
+        return this
     }
     //移除样式
     removeClass(className) {
         this.node.classList.remove(className)
+        return this
     }
     //判断样式
     hasClass(className) {
@@ -59,9 +63,13 @@ class domUtils {
     //设置样式
     setClass(className) {
         this.node.className = className
+        return this
+    }
+    clone(deep) {
+        return new domUtils(this.node.cloneNode(deep))
     }
     //添加向节点末尾添加子节点   // let fragment = document.createDocumentFragment()
-    append(html, clickCallback) {
+    append(html, callback, event) {
         let targetNode
         if(typeof html == "string") {
             let temp = document.createElement("div")
@@ -70,8 +78,8 @@ class domUtils {
         }else {
             targetNode = html.node || html
         }
-        if(clickCallback) {
-            targetNode.onclick = clickCallback
+        if(callback) {
+            targetNode["on" + (event ? event : "click")] = callback
         }
         this.node.appendChild(targetNode)
         return this
@@ -95,15 +103,19 @@ class domUtils {
     }
     // 第一个子元素
     firstChild() {
-        this.node = this.node.firstElementChild
-        return this
+        // this.node = this.node.firstElementChild
+        return new domUtils(this.node.firstElementChild)
     }
     // 最后的一个子元素
     lastChild() {
-        this.node = this.node.lastElementChild
-        return this
+        return new domUtils(this.node.lastElementChild)
     }
-    //  移除当前元素
+    // 根据class获取第一个子元素
+    getNodeByClass(className, isInDocument) {
+        let tempNode = (isInDocument ? document : this.node).getElementsByClassName(className)[0]
+        return new domUtils(tempNode)
+    }
+    // 移除当前元素
     remove() {
         this.node.remove()
     }
@@ -130,7 +142,7 @@ class domUtils {
         if(html == "" || html == "0" || html) {
             this.node.innerHTML = html
             return this
-        }else {
+        } else {
             return this.node.innerHTML
         }
     }
@@ -145,17 +157,21 @@ class domUtils {
     }
     //重定向到当前节点的父节点
     parent() {
-        this.node = this.node.parentElement
-        return this
+        return new domUtils(this.node.parentElement)
     }
-    //滚动当前节点
+    //滚动当前节点 相对于父节点
     scrollTop(scrollTop) {
         this.node.scrollTop = scrollTop
         return this
     }
-    //滚动当前节点
+    //当前节点 高度
     scrollHeight() {
         return this.node.scrollHeight
+    }
+    //滚动当前节点 内部
+    scrollTo(x, y) {
+        this.node.scrollTo(x, y)
+        return this
     }
 }
 

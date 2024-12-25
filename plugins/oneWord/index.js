@@ -1,14 +1,17 @@
-const {remote, ipcRenderer} = require('electron')
+const https = require('https');
+
+const config = require('../../common/js/config').file('plugins/oneWord');
+let oneWord = config.get("oneWord")
 
 const $ = require('../../common/js/domUtils')
 
 var size = 50
 //页面赋值
-function setValue(word){
+function setValue(word, from){
     size = 50
 
-    $("one_word").text(word.word).setClass(className(word.word))
-    $("word_from").text('—— ' + word.from).setClass(className(word.from))
+    $("one_word").text(word).setClass(className(word))
+    $("word_from").text('—— ' + from).setClass(className(from))
 
     reset_one_word()
 }
@@ -38,14 +41,31 @@ function reset_one_word(){
     }
 }
 
-ipcRenderer.send("oneWordRefresh")
-
-ipcRenderer.on("readyChange", (event, arg) => {
-    setValue(arg)
-})
+function hitokoto() {
+    let resData = ""
+    let req = https.get("https://v1.hitokoto.cn/?c=" + oneWord.hitokoto, res => {
+        res.on('data',function(data){
+            try {
+                resData += data;
+            } catch (error) {
+                // console.log(error);
+            }
+        })
+        res.on('end',function(){  
+            let resJson = JSON.parse(resData);
+            // console.log(resJson);
+            setValue(resJson.hitokoto, resJson.from)
+        })
+    })
+    req.on("error", _ => {
+        setValue(oneWord.defaultWord.word, oneWord.defaultWord.from)
+    })
+}
 
 document.addEventListener('keyup', function(e){
     if(e.keyCode == $.keyCode.Escape){
-        ipcRenderer.send("oneWordRefresh")
+        hitokoto()
     }
 })
+
+hitokoto()

@@ -47,11 +47,11 @@ const mainWindow = require('./main/main')
 //     width: 1280,
 //     height: 800,
 //     useContentSize: true,
-    // webPreferences: {
-    //   nodeIntegration: false,
-    //   preload: path.join(__dirname, 'preload.js')
-    // }
-  // })
+// webPreferences: {
+//   nodeIntegration: false,
+//   preload: path.join(__dirname, 'preload.js')
+// }
+// })
 
 //   mainWindow.loadURL(`file://${__dirname}/renderer/index.html`)
 
@@ -62,62 +62,64 @@ const mainWindow = require('./main/main')
 //任务栏图标
 let tray = null
 app.on('ready', () => {
-  tray = new Tray(nativeImage.createFromPath(__dirname+'/common/img/icon.ico'))
-  // //菜单
-  // var clockSwitch = config.get("clock").switch;
-  const contextMenu = Menu.buildFromTemplate([
-  //   {label: '签到', submenu: [
-  //     {label: '示例', type: 'normal', click: function(){
-  //       clock.remind({time: '00:00',todo: '签到'})
-  //     }},
-  //     {label: '开启', type: 'checkbox', checked:clockSwitch, click: function(){
-  //       clockSwitch = !clockSwitch;
-  //       clockSwitch ? clock.init() : clock.destory();
-  //       config.set("clock:switch", clockSwitch);
-  //     }},
-      // {label: '设置', type: 'normal', click: function(){
-      //   clock.custom({time: '00:00',todo: '签到'})
-      // }}
-    // ]},
-    // {label: '概览', type: 'normal', click: function(){
-    //   overview.init(__dirname)
-    // }},
-    // {label: 'giphy', type: 'normal', click: function(){
-    //   giphy.init()
-    // }},
-  //   {label: '翻译', type: 'normal', click: function(){
-  //     translateWindow.show();
-  //   }},
-  //   {label: '备忘', type: 'normal', click: function(){
-  //     todoListWindow.init();
-  //   }},
-  //   {label: '抖音', type: 'normal', click: function(){
-  //     douyin.show();
-  //   }},
-    {label: '退出', type: 'normal', click: function(){
-      // unloadPlugin();
-      app.quit();
-    }}
-  ])
-  //任务栏图标文字
-  // tray.setToolTip()
-  tray.setContextMenu(contextMenu)
-  // tray.on('click', () => {
-  //   tray.setToolTip('index:')
-  // })
-  // 注册一个 'Alt+R' 的全局快捷键
-  // globalShortcut.register('Alt+R', () => {
-  //   translateWindow.show();
-  // });
-  //启动子项目
-  // loadPlugin();
-  mainWindow.init()
+    tray = new Tray(nativeImage.createFromPath(__dirname + '/common/img/icon.ico'))
+    // //菜单
+    // var clockSwitch = config.get("clock").switch;
+    const contextMenu = Menu.buildFromTemplate([
+        //   {label: '签到', submenu: [
+        //     {label: '示例', type: 'normal', click: function(){
+        //       clock.remind({time: '00:00',todo: '签到'})
+        //     }},
+        //     {label: '开启', type: 'checkbox', checked:clockSwitch, click: function(){
+        //       clockSwitch = !clockSwitch;
+        //       clockSwitch ? clock.init() : clock.destory();
+        //       config.set("clock:switch", clockSwitch);
+        //     }},
+        // {label: '设置', type: 'normal', click: function(){
+        //   clock.custom({time: '00:00',todo: '签到'})
+        // }}
+        // ]},
+        // {label: '概览', type: 'normal', click: function(){
+        //   overview.init(__dirname)
+        // }},
+        // {label: 'giphy', type: 'normal', click: function(){
+        //   giphy.init()
+        // }},
+        //   {label: '翻译', type: 'normal', click: function(){
+        //     translateWindow.show();
+        //   }},
+        //   {label: '备忘', type: 'normal', click: function(){
+        //     todoListWindow.init();
+        //   }},
+        //   {label: '抖音', type: 'normal', click: function(){
+        //     douyin.show();
+        //   }},
+        {
+            label: '退出', type: 'normal', click: function () {
+                // unloadPlugin();
+                app.quit();
+            }
+        }
+    ])
+    //任务栏图标文字
+    // tray.setToolTip()
+    tray.setContextMenu(contextMenu)
+    // tray.on('click', () => {
+    //   tray.setToolTip('index:')
+    // })
+    // 注册一个 'Alt+R' 的全局快捷键
+    // globalShortcut.register('Alt+R', () => {
+    //   translateWindow.show();
+    // });
+    //启动子项目
+    // loadPlugin();
+    mainWindow.init()
 })
 
 // var loadPlugin = () => {
 //   config.get("clock").switch && clock.init();
 //   translateWindow.init();
-  //mainWindow.init();
+//mainWindow.init();
 // }
 
 // var unloadPlugin = () => {
@@ -126,9 +128,13 @@ app.on('ready', () => {
 // }
 
 app.on('window-all-closed', function () {
-  console.log("all close")
+    console.log("all close")
 })
 app.on('will-quit', () => {
-  // 清空所有快捷键
-  globalShortcut.unregisterAll()
+    // 清空所有快捷键
+    globalShortcut.unregisterAll()
 })
+
+// 开机自启
+// app.setLoginItemSettings
+// https://www.electronjs.org/docs/latest/api/app#appsetloginitemsettingssettings-macos-windows

@@ -2,7 +2,7 @@ const {BrowserWindow, ipcMain} = require('electron')
 const url = require('url')
 const path = require('path')
 
-const config = require('../../common/js/config').file('plugins/_template');
+// const config = require('../../common/js/config').file('plugins/_template');
 
 const cancelTitleBarMenu = require('../../common/js/cancelTitleBarMenu')
 
@@ -35,18 +35,12 @@ const mainWindow = {
             cancelTitleBarMenu(this.win)
             this.win.show()
         })
-        // this.win.on('hide', _ => {
-        //     this.callback()
-        // })
-        // this.win.on('blur', () => {
-        //     this.win.hide()
-        // })
+        this.win.on('hide', _ => {
+            this.win = this.win.destroy()
+        })
     },
     show: function() {
-        this.win ? this.win.show() : this.creat()
-    },
-    init: function(callback) {
-        this.callback = callback
+        (this.win && !this.win.isDestroyed()) ? this.win.show() : this.creat()
     }
 }
 

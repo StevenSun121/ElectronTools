@@ -34,12 +34,22 @@ body {
     -webkit-app-region: drag;
 }
 
+@keyframes circle {
+	0% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(360deg);
+	}
+}
+
 #funcMusicPic {
     width: 150px;
     height: 150px;
     margin: 0px 25px 20px 25px;
     border-radius: 50%;
     -webkit-user-drag: none;
+    animation: circle 20s infinite linear;
 }
 
 #funcMusicName {
@@ -120,7 +130,7 @@ body {
     width: 350px;
     display: inline-block;
     position: relative;
-    left: 150px;
+    left: 90px;
     top: 26px;
     -webkit-app-region: no-drag;
 }
@@ -224,7 +234,7 @@ body {
 .titleFunc {
     -webkit-app-region: no-drag;
     height: 50px;
-    width: 105px;
+    width: 160px;
     position: absolute;
     right: 0px;
     top: 0px;
@@ -242,6 +252,29 @@ body {
 
 #close:hover {
     background-color: #ff5252;
+}
+
+#settingDiv {
+    right: 8px;
+    position: fixed;
+    top: 50px;
+    border: 1px solid #00000020;
+    width: 150px;
+    height: auto;
+    overflow: hidden;
+    background-color: #e6e6e6;
+    color: #777777;
+    font-size: 15px;
+}
+
+.settingLrc {
+    line-height: 28px;
+    text-align: center;
+    border-bottom: 1px solid #00000020;
+}
+
+.settingLrcLabel {
+    margin: 0 5px;
 }
 
 .musicContainer {
